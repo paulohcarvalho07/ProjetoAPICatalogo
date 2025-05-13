@@ -3,6 +3,7 @@ using APICatalogo.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace APICatalogo.Controllers
 {
@@ -18,26 +19,13 @@ namespace APICatalogo.Controllers
         }
 
         // /api/produtos/primeiro
-        [HttpGet("primeiro")]
-        [HttpGet("teste")]
-        [HttpGet("/primeiro")]
-        public ActionResult<Produto> GetPrimeiro()
+        //[HttpGet("primeiro")]        
+        //[HttpGet("/primeiro")]
+        [HttpGet("{valor:alpha:length(5)}")]
+        public ActionResult<Produto> GetPrimeiro(string valor)
         {
-            try
-            {
-                var produto = _context.Produtos.FirstOrDefault();
-                if (produto == null)
-                {
-                    return NotFound("Produtos não encontrados...");
-                }
-                return produto;
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+            var teste = valor;
+            return _context.Produtos.FirstOrDefault();                
         }
 
         // /api/produtos
@@ -61,14 +49,12 @@ namespace APICatalogo.Controllers
             }            
         }
 
-        // /api/produtos/id
-        [HttpGet("{id:int/{nome=Caderno}}", Name="ObterProduto")]
-        public ActionResult<Produto> Get(int id, string nome)
+        // /api/produtos/1
+        [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
+        public ActionResult<Produto> Get(int id)
         {
             try
             {
-                var parametro = nome;
-
                 var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
 
                 if (produto == null)
