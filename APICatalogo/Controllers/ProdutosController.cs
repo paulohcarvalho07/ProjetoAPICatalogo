@@ -2,6 +2,7 @@
 using APICatalogo.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -51,24 +52,15 @@ namespace APICatalogo.Controllers
 
         // /api/produtos/1
         [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
-        public async Task<ActionResult<Produto>> Get(int id)
-        {
-            try
-            {
+        public async Task<ActionResult<Produto>> Get([FromQuery]int id)
+        {                          
                 var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
 
                 if (produto == null)
                 {
                     return NotFound($"Produto com id= {id} não encontrado...");
                 }
-                return produto;
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }            
+                return produto;                                  
         }
 
         // /produtos
