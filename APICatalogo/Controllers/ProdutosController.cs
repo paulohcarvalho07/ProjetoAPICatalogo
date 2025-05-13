@@ -65,11 +65,11 @@ namespace APICatalogo.Controllers
 
         // /produtos
         [HttpPost]
-        public ActionResult Post(Produto produto)
+        public ActionResult Post([FromBody]Produto produto)
         {
-            if (produto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Dados inválidos");
+               return BadRequest("Dados inválidos");
             }
 
             _context.Produtos.Add(produto);
