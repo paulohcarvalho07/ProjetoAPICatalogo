@@ -17,6 +17,28 @@ namespace APICatalogo.Controllers
             _context = context;
         }
 
+        // /produtos/primeiro
+        [HttpGet("primeiro")]
+        public ActionResult<Produto> GetPrimeiro()
+        {
+            try
+            {
+                var produto = _context.Produtos.FirstOrDefault();
+                if (produto == null)
+                {
+                    return NotFound("Produtos não encontrados...");
+                }
+                return produto;
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar a sua solicitação.");
+            }
+        }
+
+        // /produtos
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
@@ -37,6 +59,7 @@ namespace APICatalogo.Controllers
             }            
         }
 
+        // /produtos/id
         [HttpGet("{id:int}", Name="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
@@ -58,6 +81,7 @@ namespace APICatalogo.Controllers
             }            
         }
 
+        // /produtos
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
