@@ -16,8 +16,8 @@ builder.Services.AddSwaggerGen();
 
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-var valor1 = builder.Configuration["chave1"];
-var valor2 = builder.Configuration["secao1:chave2"];
+//var valor1 = builder.Configuration["chave1"];
+//var valor2 = builder.Configuration["secao1:chave2"];
 
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
@@ -36,12 +36,25 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.Use(async (context, next) =>
+    {
+        //adicionar o codigo antes do request
+        await next(context);
+        //adicionar o codigo depois do request
+    });
+
 app.MapControllers();
+
+app.Run(async (context) =>
+    {
+        await context.Response.WriteAsync("Middleware final");
+    });
 
 app.Run();
