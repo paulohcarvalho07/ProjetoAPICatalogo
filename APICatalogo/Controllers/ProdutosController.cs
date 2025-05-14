@@ -13,10 +13,12 @@ namespace APICatalogo.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<ProdutosController> _logger;
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(AppDbContext context, ILogger<ProdutosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // /api/produtos/primeiro
@@ -33,21 +35,13 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
-            try
+            var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
+            if (produtos == null)
             {
-                var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
-                if (produtos == null)
-                {
-                    return NotFound("Produtos não encontrados...");
-                }
-                return produtos;
+                _logger.LogWarning($"Produtos não encontrados...");
+                return NotFound("Produtos não encontrados...");
             }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }            
+            return produtos;           
         }
 
         // /api/produtos/1
@@ -58,6 +52,7 @@ namespace APICatalogo.Controllers
 
                 if (produto == null)
                 {
+                    _logger.LogWarning($"Produto com id= {id} não encontrada...");
                     return NotFound($"Produto com id= {id} não encontrado...");
                 }
                 return produto;                                  
@@ -69,7 +64,8 @@ namespace APICatalogo.Controllers
         {
             if (!ModelState.IsValid)
             {
-               return BadRequest("Dados inválidos");
+                _logger.LogWarning($"Dados inválidos...");
+                return BadRequest("Dados inválidos");
             }
 
             _context.Produtos.Add(produto);
@@ -83,6 +79,7 @@ namespace APICatalogo.Controllers
         {
             if (id != produto.ProdutoId)
             {
+                _logger.LogWarning($"Dados inválidos...");
                 return BadRequest("Dados inválidos");
             }
 
@@ -100,6 +97,7 @@ namespace APICatalogo.Controllers
 
             if (produto is null)
             {
+                _logger.LogWarning($"Produto com id= {id} não encontrada...");
                 return NotFound($"Produto com id= {id} não localizado...");
             }
 

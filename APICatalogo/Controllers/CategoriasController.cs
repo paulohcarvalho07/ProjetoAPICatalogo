@@ -37,28 +37,18 @@ namespace APICatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable>> Get()
         {
-            try
-            {
-                return await _context.Categorias.AsNoTracking().ToListAsync();
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }            
+            return await _context.Categorias.AsNoTracking().ToListAsync();      
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult Get(int id)
+        public ActionResult<Categoria> Get(int id)
         {
-            //throw new Exception("Exceção ao retornar a categoria pelo id");    
-            
-            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
+            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
 
-            if (categoria is null)
+            if (categoria == null)
             {
-                return NotFound($"Categoria com id= {id} não localizada...");
+                _logger.LogWarning($"Categoria com id= {id} não encontrada...");
+                return NotFound($"Categoria com id= {id} não encontrada...");
             }
             return Ok(categoria);
         }
@@ -68,6 +58,7 @@ namespace APICatalogo.Controllers
         {
             if (categoria is null)
             {
+                _logger.LogWarning($"Dados inválidos...");
                 return BadRequest("Dados inválidos");
             }
 
@@ -80,31 +71,31 @@ namespace APICatalogo.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
-            if(id != categoria.CategoriaId)
+            if (id != categoria.CategoriaId)
             {
+                _logger.LogWarning($"Dados inválidos...");
                 return BadRequest("Dados inválidos");
             }
-            
-            _context.Categorias.Entry(categoria).State = EntityState.Modified;
-            _context.SaveChanges();
 
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context.SaveChanges();
             return Ok(categoria);
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var produto = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
-            
-            if (produto is null)
+            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+
+            if (categoria == null)
             {
-                return NotFound($"Categoria com id= {id} não localizada...");
+                _logger.LogWarning($"Categoria com id={id} não encontrada...");
+                return NotFound($"Categoria com id={id} não encontrada...");
             }
 
-            _context.Categorias.Remove(produto);
+            _context.Categorias.Remove(categoria);
             _context.SaveChanges();
-
-            return Ok(produto);
+            return Ok(categoria);
         }
     }
 }
