@@ -1,5 +1,6 @@
 using APICatalogo.Context;
 using APICatalogo.Extensions;
+using APICatalogo.Filters;
 using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -29,6 +30,7 @@ builder.Services.AddTransient<IMeuServico, MeuServico>();
 //desabilitando servico inferencia de injecao de dependencia nos controladores
 //builder.Services.Configure<ApiBehaviorOptions>(options => { options.DisableImplicitFromServicesParameters = true; });
 
+builder.Services.AddScoped<ApiLoggingFilter>();
 
 var app = builder.Build();
 

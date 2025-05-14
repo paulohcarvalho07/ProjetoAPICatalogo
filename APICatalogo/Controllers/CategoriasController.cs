@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.Filters;
 using APICatalogo.Models;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +17,7 @@ namespace APICatalogo.Controllers
     {
         private readonly AppDbContext _context;
 
-        public CategoriasController(AppDbContext context, IConfiguration configuration)
+        public CategoriasController(AppDbContext context)
         {
             _context = context;
         }
@@ -29,11 +30,12 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable> Get()
+        [ServiceFilter(typeof(ApiLoggingFilter))]
+        public async Task<ActionResult<IEnumerable>> Get()
         {
             try
             {
-                return _context.Categorias.AsNoTracking().ToList();
+                return await _context.Categorias.AsNoTracking().ToListAsync();
             }
             catch (Exception)
             {
