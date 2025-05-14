@@ -15,36 +15,10 @@ namespace APICatalogo.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
 
         public CategoriasController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
-            _configuration = configuration;
-        }
-
-        [HttpGet("LerArquivoConfiguracao")]
-        public string GetValores()
-        {
-            var valor1 = _configuration["chave1"];
-            var valor2 = _configuration["chave2"];
-
-            var secao1 = _configuration["secao1:chave2"];
-
-            return $"Chave1 = {valor1} \n Chave 2 = {valor2} \n Seção1 => Chave2 = {secao1}";
-        }
-
-
-        [HttpGet("UsandoFromServices/{nome}")]
-        public ActionResult<string> GetSaudacaoFromServices([FromServices] IMeuServico meuServico, string nome)
-        {
-            return meuServico.Saudacao(nome);
-        }
-
-        [HttpGet("SemFromServices/{nome}")]
-        public ActionResult<string> GetSaudacaoSemFromServices(IMeuServico meuServico, string nome)
-        {
-            return meuServico.Saudacao(nome);
         }
 
         [HttpGet("produtos")]
@@ -72,22 +46,20 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult Get(int id)
         {
-            try
-            {
-                var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
+            throw new Exception("Exceção ao retornar a categoria pelo id");    
+            //string[] teste = null;
+            //if(teste.Length > 0)
+            //{
 
-                if (categoria is null)
-                {
-                    return NotFound($"Categoria com id= {id} não localizada...");
-                }
-                return Ok(categoria);
+            //}
+
+            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
+
+            if (categoria is null)
+            {
+                return NotFound($"Categoria com id= {id} não localizada...");
             }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }                
+            return Ok(categoria);
         }
 
         [HttpPost]

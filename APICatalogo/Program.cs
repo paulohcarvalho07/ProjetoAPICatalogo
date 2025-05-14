@@ -1,4 +1,5 @@
 using APICatalogo.Context;
+using APICatalogo.Extensions;
 using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -36,25 +37,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
-    {
-        //adicionar o codigo antes do request
-        await next(context);
-        //adicionar o codigo depois do request
-    });
-
 app.MapControllers();
-
-app.Run(async (context) =>
-    {
-        await context.Response.WriteAsync("Middleware final");
-    });
 
 app.Run();
