@@ -1,5 +1,6 @@
 ﻿using APICatalogo.Context;
 using APICatalogo.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Repositories;
@@ -11,6 +12,11 @@ public class CategoriaRepository : ICategoriaRepository
     public CategoriaRepository(AppDbContext context)
     {
         _context = context;
+    }
+
+    public IEnumerable<Categoria> GetCategoriasProdutos()
+    {
+        return _context.Categorias.AsNoTracking().Include(p => p.Produtos).ToList();
     }
 
     public IEnumerable<Categoria> GetCategorias()

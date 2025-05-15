@@ -2,6 +2,7 @@ using APICatalogo.Context;
 using APICatalogo.Extensions;
 using APICatalogo.Filters;
 using APICatalogo.Logging;
+using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -39,6 +40,7 @@ builder.Services.AddTransient<IMeuServico, MeuServico>();
 //builder.Services.Configure<ApiBehaviorOptions>(options => { options.DisableImplicitFromServicesParameters = true; });
 
 builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 
 builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomerLoggerProviderConfiguration
 {
