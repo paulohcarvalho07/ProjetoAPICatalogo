@@ -32,7 +32,6 @@ namespace APICatalogo.Controllers
 
             var categoriasProdutos = _repository.GetCategoriasProdutos();
             return Ok(categoriasProdutos);
-            //return _context.Categorias.AsNoTracking().Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
         }
 
         [HttpGet]
