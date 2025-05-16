@@ -12,6 +12,6 @@ public class ProdutoRepository : Repository<Produto>, IProdutoRepository
 
     public IEnumerable<Produto> GetProdutosPorCategoria(int id)
     {
-        return GetAll().Where(p => p.ProdutoId == id);
+        return GetAll().Where(c => c.CategoriaId == id);
     }
 }
