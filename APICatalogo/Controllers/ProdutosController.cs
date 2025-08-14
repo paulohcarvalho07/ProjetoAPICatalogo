@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.DTOs;
 using APICatalogo.Models;
 using APICatalogo.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +24,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("produtos/{id}")]
-        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosCategoria(int id)
         {
             var produtos = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
 
@@ -35,7 +36,7 @@ namespace APICatalogo.Controllers
 
         // /api/produtos
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public ActionResult<IEnumerable<ProdutoDTO>> Get()
         {
             var produtos = _uof.ProdutoRepository.GetAll();
             if (produtos is null)
@@ -48,7 +49,7 @@ namespace APICatalogo.Controllers
 
         // /api/produtos/1
         [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
-        public ActionResult<Produto> Get([FromQuery]int id)
+        public ActionResult<ProdutoDTO> Get([FromQuery]int id)
         {
             var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
@@ -62,9 +63,9 @@ namespace APICatalogo.Controllers
 
         // /produtos
         [HttpPost]
-        public ActionResult Post([FromBody]Produto produto)
+        public ActionResult<ProdutoDTO> Post([FromBody]ProdutoDTO produtoDto)
         {
-            if (!ModelState.IsValid)
+            if (produtoDto is null)
             {
                 _logger.LogWarning($"Dados inválidos...");
                 return BadRequest("Dados inválidos");
@@ -77,7 +78,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Produto produto)
+        public ActionResult<ProdutoDTO> Put(int id, ProdutoDTO produtoDto)
         {
             if (id != produto.ProdutoId)
             {
@@ -92,7 +93,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<ProdutoDTO> Delete(int id)
         {
             var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
