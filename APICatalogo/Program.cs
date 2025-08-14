@@ -20,7 +20,7 @@ builder.Services.AddControllers(options =>
 .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
+}).AddNewtonsoftJson();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -51,7 +51,7 @@ builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomerLoggerProvide
     LogLevel = LogLevel.Information
 }));
 
-builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
+builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile)); 
 
 var app = builder.Build();
 
