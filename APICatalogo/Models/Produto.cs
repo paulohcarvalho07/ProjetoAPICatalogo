@@ -17,7 +17,7 @@ public class Produto : IValidatableObject
     public string? Nome { get; set; }
 
     [Required]
-    [StringLength(10, ErrorMessage = "A descrição deve ter no máximo {1} caracteres")]
+    [StringLength(30, ErrorMessage = "A descrição deve ter no máximo {1} caracteres")]
     public string? Descricao { get; set; }
 
     [Required]
