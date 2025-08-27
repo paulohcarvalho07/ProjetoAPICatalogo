@@ -4,6 +4,7 @@ using APICatalogo.Extensions;
 using APICatalogo.Filters;
 using APICatalogo.Logging;
 using APICatalogo.Models;
+using APICatalogo.RateLimitOptions;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Pomelo.EntityFrameworkCore.MySql.Query.Expressions.Internal;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -132,19 +134,24 @@ builder.Services.AddAuthorization(options =>
                                               || context.User.IsInRole("SuperAdmin")));  
 });
 
+var myOptions = new MyRateLimitingOptions();
+
+builder.Configuration.GetSection(MyRateLimitingOptions.MyRateLimit).Bind(myOptions);
+
+//rate limiting personalizado
 builder.Services.AddRateLimiter(rateLimiteOptions =>
 {
     rateLimiteOptions.AddFixedWindowLimiter(policyName: "fixedwindow", options =>
     {
-        options.PermitLimit = 1;
-        options.Window = TimeSpan.FromSeconds(5);
-        options.QueueLimit = 2;
+        options.PermitLimit = myOptions.PermitLimit;//1;
+        options.Window = TimeSpan.FromSeconds(myOptions.Window);
+        options.QueueLimit = myOptions.QueueLimit;//2;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
     rateLimiteOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
-
+//rate limiting global
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
