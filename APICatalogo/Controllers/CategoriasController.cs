@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace APICatalogo.Controllers
     [EnableCors("OrigensComAcessoPermitido")]
     [Route("[controller]")]
     [ApiController]
+    //[EnableRateLimiting("fixedwindow")]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _uof;
@@ -36,6 +38,7 @@ namespace APICatalogo.Controllers
 
         [HttpGet]
         //[Authorize]
+        [DisableRateLimiting]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {

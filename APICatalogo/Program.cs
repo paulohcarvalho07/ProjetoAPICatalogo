@@ -8,11 +8,13 @@ using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -130,6 +132,36 @@ builder.Services.AddAuthorization(options =>
                                               || context.User.IsInRole("SuperAdmin")));  
 });
 
+builder.Services.AddRateLimiter(rateLimiteOptions =>
+{
+    rateLimiteOptions.AddFixedWindowLimiter(policyName: "fixedwindow", options =>
+    {
+        options.PermitLimit = 1;
+        options.Window = TimeSpan.FromSeconds(5);
+        options.QueueLimit = 2;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+    rateLimiteOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                            RateLimitPartition.GetFixedWindowLimiter(
+                                partitionKey: httpContext.User.Identity?.Name ?? 
+                                              httpContext.Request.Headers.Host.ToString(),
+                                factory: partition => new FixedWindowRateLimiterOptions
+                                {
+                                    AutoReplenishment = true,
+                                    PermitLimit = 2,
+                                    QueueLimit = 0,
+                                    Window = TimeSpan.FromSeconds(10)
+                                }));
+});
+
 
 builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
@@ -158,6 +190,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles(); 
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseCors();
 
