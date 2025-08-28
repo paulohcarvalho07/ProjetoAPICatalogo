@@ -45,9 +45,15 @@ public class CategoriasController : ControllerBase
     //[Authorize]
     [DisableRateLimiting]
     [ServiceFilter(typeof(ApiLoggingFilter))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
     {
         var categorias = await _uof.CategoriaRepository.GetAllAsync();
+
+        if(categorias is null)
+            return NotFound("Não existem categorias...");
 
         var categoriasDto = categorias.ToCategoriaDTOList();
 
@@ -151,7 +157,9 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<CategoriaDTO>> Put(int id, CategoriaDTO categoriaDto)
     {
         if (id != categoriaDto.CategoriaId)
@@ -172,6 +180,9 @@ public class CategoriasController : ControllerBase
 
     [HttpDelete("{id:int}")]
     [Authorize(Policy ="AdminOnly")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<CategoriaDTO>> Delete(int id)
     {
         var categoria = await _uof.CategoriaRepository.GetAsync(c => c.CategoriaId == id);

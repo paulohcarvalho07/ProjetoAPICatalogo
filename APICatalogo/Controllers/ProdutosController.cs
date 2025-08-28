@@ -87,6 +87,9 @@ public class ProdutosController : ControllerBase
     /// <returns>Retorna uma lista de objetos Produto</returns>
     [Authorize(Policy ="UserOnly")]
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
     {
         var produtos = await _uof.ProdutoRepository.GetAllAsync();
@@ -143,6 +146,10 @@ public class ProdutosController : ControllerBase
     }
 
     [HttpPatch("{id}/UpdatePartial")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<ProdutoDTOUpdateResponse>> Patch(int id, 
         JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDTO)
     {

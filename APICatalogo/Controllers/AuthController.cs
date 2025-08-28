@@ -67,6 +67,9 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Authorize(Policy = "SuperAdminOnly")]
     [Route("AddUserToRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType]
     public async Task<IActionResult> AddUserToRole(string email, string roleName)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -100,6 +103,9 @@ public class AuthController : ControllerBase
     /// <remarks>Retorna o Status 200 e o token</remarks>
     [HttpPost]
     [Route("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesDefaultResponseType]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         var user = await _userManager.FindByNameAsync(model.UserName!);
@@ -149,6 +155,9 @@ public class AuthController : ControllerBase
     /// <remarks>retorna o Status 200</remarks>
     [HttpPost]
     [Route("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
+    [ProducesDefaultResponseType]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         var userExists = await _userManager.FindByNameAsync(model.UserName!);
@@ -228,6 +237,9 @@ public class AuthController : ControllerBase
     [Authorize(Policy = "ExclusiveOnly")]
     [HttpPost]
     [Route("revoke/{username}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType]
     public async Task<IActionResult> Revoke(string username)
     {
         var user = await _userManager.FindByNameAsync(username);
