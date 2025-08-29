@@ -89,19 +89,28 @@ public class ProdutosController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
     {
-        var produtos = await _uof.ProdutoRepository.GetAllAsync();
-        if (produtos is null)
+        try
         {
-            _logger.LogWarning($"Produtos não encontrados...");
-            return NotFound("Produtos não encontrados...");
+            var produtos = await _uof.ProdutoRepository.GetAllAsync();            
+
+            if (produtos is null)
+            {
+                _logger.LogWarning($"Produtos não encontrados...");
+                return NotFound("Produtos não encontrados...");
+            }
+
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+
+            return Ok(produtosDto);
         }
-
-        var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
-
-        return Ok(produtosDto);
+        catch (Exception)
+        {
+            return BadRequest();
+        }
     }
 
     /// <summary>
@@ -113,6 +122,11 @@ public class ProdutosController : ControllerBase
     public async Task<ActionResult<ProdutoDTO>> Get([FromQuery] int id)
     {
         var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
+
+        if (id == null || id <= 0)
+        {
+            return BadRequest("ID de produto inválido");
+        }
 
         if (produto is null)
         {
