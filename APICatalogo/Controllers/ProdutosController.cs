@@ -95,8 +95,8 @@ public class ProdutosController : ControllerBase
     {
         try
         {
-            var produtos = await _uof.ProdutoRepository.GetAllAsync();            
-
+            var produtos = await _uof.ProdutoRepository.GetAllAsync();
+            
             if (produtos is null)
             {
                 _logger.LogWarning($"Produtos não encontrados...");
